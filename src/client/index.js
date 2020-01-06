@@ -16,7 +16,7 @@ import './css/main.css';
 const playMenu = document.getElementById('play-menu');
 const playButton = document.getElementById('play-button');
 const usernameInput = document.getElementById('username-input');
-const shiptype = document.getElementById('shiptype');
+const shiptype = document.getElementById('shiptype').getElementsByClassName('active');
 
 Promise.all([
   connect(onGameOver),
@@ -29,7 +29,7 @@ Promise.all([
   usernameInput.focus();
   playButton.onclick = () => {
     // Play!
-    play(usernameInput.value,shiptype.value);
+    play(usernameInput.value,shiptype[0].getAttribute('value'));
     playMenu.classList.add('hidden');
     initState();
     startCapturingInput();
@@ -44,3 +44,4 @@ function onGameOver() {
   playMenu.classList.remove('hidden');
   setLeaderboardHidden(true);
 }
+
