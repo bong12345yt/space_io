@@ -38,6 +38,10 @@ export const updateDirection = throttle(20, dir => {
   socket.emit(Constants.MSG_TYPES.INPUT, dir);
 });
 
+export const updateMousePos = throttle(20, dis => {
+  socket.emit(Constants.MSG_TYPES.MOUSEPOS, dis);
+});
+
 export const updateSpeedUp = throttle(20, () => {
   console.log("send message!");
   socket.emit(Constants.MSG_TYPES.INPUT_MOUSE_LEFT_CLICK);

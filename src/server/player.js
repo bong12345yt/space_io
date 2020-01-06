@@ -16,10 +16,16 @@ class Player extends ObjectClass {
     this.ShipType = shiptype;
     this.GunQuantity = 1;
     this.isSpeedUp = false;
+    this.mousePos = {distance:0}; 
+    this.currentSpeed = this.speed;
   }
 
   // Returns a newly created bullet, or null.
   update(dt) {
+
+    const realSpeed = this.mousePos.distance/Constants.PLAYER_MOUSE_MAX_DISTANCE;
+    this.speed = (realSpeed > 1.0) ? this.currentSpeed : realSpeed*this.currentSpeed;
+
     super.update(dt);
     this.anim.OnAnimate();
 
@@ -57,9 +63,14 @@ class Player extends ObjectClass {
     return null;
   }
 
+  setMousePos(pos){
+    //console.log(this.mousePos);
+    this.mousePos = pos;
+  }
+
   speedUp()
   {
-    this.speed = this.speed + 100;
+    this.currentSpeed = this.currentSpeed + 100;
   }
 
   takeBulletDamage() {

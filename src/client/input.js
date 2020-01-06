@@ -1,9 +1,13 @@
 // Learn more about this file at:
 // https://victorzhou.com/blog/build-an-io-game-part-1/#6-client-input-%EF%B8%8F
-import { updateDirection, updateSpeedUp} from './networking';
+import { updateDirection, updateSpeedUp, updateMousePos} from './networking';
+
+const canvas = document.getElementById('game-canvas');
 
 function onMouseInput(e) {
   handleInput(e.clientX, e.clientY);
+  
+  
 }
 
 function onMouseClick(e) {
@@ -17,9 +21,21 @@ function onTouchInput(e) {
   handleInput(touch.clientX, touch.clientY);
 }
 
+function distance(posA, posB){
+  const dx = posA.x - posB.x;
+  const dy = posA.y - posB.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 function handleInput(x, y) {
   const dir = Math.atan2(x - window.innerWidth / 2, window.innerHeight / 2 - y);
+  const x_t = x - window.innerWidth / 2;
+  const y_t = window.innerHeight / 2 - y;
+  const pos = {x: x, y: y};
+  const mePos = {x: canvas.width/2, y: canvas.height/2};
+  const dis = distance(mePos, pos);
   updateDirection(dir);
+  updateMousePos({distance: dis});
 }
 
 export function startCapturingInput() {
@@ -31,7 +47,7 @@ export function startCapturingInput() {
 
 export function stopCapturingInput() {
   window.removeEventListener('mousemove', onMouseInput);
-  window.removeEventListener('click', onMouseInput);
+  window.removeEventListener('click', onMouseClick);
   window.removeEventListener('touchstart', onTouchInput);
   window.removeEventListener('touchmove', onTouchInput);
 }

@@ -40,6 +40,12 @@ class Game {
     }
   }
 
+  handleMousePos(socket, dis) {
+    if (this.players[socket.id]) {
+      this.players[socket.id].setMousePos(dis);
+    }
+  }
+
   handleMouseLeftClick(socket) {
     if (this.players[socket.id]) {
       this.players[socket.id].speedUp();

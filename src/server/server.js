@@ -34,6 +34,7 @@ io.on('connection', socket => {
 
   socket.on(Constants.MSG_TYPES.JOIN_GAME, joinGame);
   socket.on(Constants.MSG_TYPES.INPUT, handleInput);
+  socket.on(Constants.MSG_TYPES.MOUSEPOS, handleMousePos);
   socket.on(Constants.MSG_TYPES.INPUT_MOUSE_LEFT_CLICK, handleMouseLeftClick);
   socket.on('disconnect', onDisconnect);
 });
@@ -47,6 +48,10 @@ function joinGame(data) {
 
 function handleInput(dir) {
   game.handleInput(this, dir);
+}
+
+function handleMousePos(dis) {
+  game.handleMousePos(this, dis);
 }
 
 function handleMouseLeftClick(dir) {

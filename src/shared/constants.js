@@ -3,6 +3,7 @@ module.exports = Object.freeze({
   PLAYER_MAX_HP: 100,
   PLAYER_SPEED: 400,
   PLAYER_FIRE_COOLDOWN: 0.25,
+  PLAYER_MOUSE_MAX_DISTANCE: 250,
 
   BULLET_RADIUS: 5,
   BULLET_SPEED: 800,
@@ -34,6 +35,7 @@ module.exports = Object.freeze({
     JOIN_GAME: 'join_game',
     GAME_UPDATE: 'update',
     INPUT: 'input',
+    MOUSEPOS: 'mousepos',
     GAME_OVER: 'dead',
     INPUT_MOUSE_LEFT_CLICK: 'mouseleftclick',
   },
