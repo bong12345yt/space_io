@@ -1,0 +1,99 @@
+const ObjectClass = require('./object');
+const Bullet = require('./bullet');
+const Constants = require('../shared/constants');
+const Animation = require('./animation');
+
+class Player extends ObjectClass {
+  constructor(id, username, x, y, shiptype) {
+    super(id, x, y, Math.random() * 2 * Math.PI, Constants.PLAYER_SPEED);
+    this.username = username;
+    this.hp = Constants.PLAYER_MAX_HP;
+    this.fireCooldown = 0;
+    this.score = 0;
+    this.anim = new Animation();
+    this.anim.FrameRate = 20;
+    this.anim.FramesLimit = 19;
+    this.ShipType = shiptype;
+    this.GunQuantity = 1;
+    this.isSpeedUp = false;
+  }
+
+  // Returns a newly created bullet, or null.
+  update(dt) {
+    super.update(dt);
+    this.anim.OnAnimate();
+
+    // Update score
+    this.score += dt * Constants.SCORE_PER_SECOND;
+
+    this.hp += dt*Constants.HP_PER_SECOND;
+    if (this.hp > Constants.PLAYER_MAX_HP) {
+      this.hp = Constants.PLAYER_MAX_HP;
+    }
+
+    // Make sure the player stays in bounds
+    this.x = Math.max(0, Math.min(Constants.MAP_SIZE, this.x));
+    this.y = Math.max(0, Math.min(Constants.MAP_SIZE, this.y));
+
+    // Fire a bullet, if needed
+    this.fireCooldown -= dt;
+    if (this.fireCooldown <= 0) {
+      this.fireCooldown += Constants.PLAYER_FIRE_COOLDOWN;
+      let bullets = [];
+      for (let i = 0; i < this.GunQuantity; i++) {
+
+        if ((i + 1) % 2 == 0) {
+          let deltadir = (i + 1) / 2 * 0.2;
+          bullets.push(new Bullet(this.id, this.x, this.y, this.direction + deltadir));
+        }
+        else {
+          let deltadir = i / 2 * 0.2;
+          bullets.push(new Bullet(this.id, this.x, this.y, this.direction - deltadir));
+        }
+      }
+      return bullets;
+    }
+
+    return null;
+  }
+
+  speedUp()
+  {
+    this.speed = this.speed + 100;
+  }
+
+  takeBulletDamage() {
+    this.hp -= Constants.BULLET_DAMAGE;
+  }
+
+  takeHeal() {
+    this.hp += Constants.ITEM_HEATH_HP;
+    if (this.hp > Constants.PLAYER_MAX_HP) {
+      this.hp = Constants.PLAYER_MAX_HP;
+    }
+  }
+
+  takeGun() {
+    this.GunQuantity += Constants.ITEM_GUN_BONUS;
+    if (this.GunQuantity > Constants.ITEM_MAX_GUN) {
+      this.GunQuantity = Constants.ITEM_MAX_GUN;
+    }
+  }
+
+  onDealtDamage() {
+    this.score += Constants.SCORE_BULLET_HIT;
+  }
+
+  serializeForUpdate() {
+    return {
+      ...(super.serializeForUpdate()),
+      direction: this.direction,
+      hp: this.hp,
+      current_frame: this.anim.CurrentFrame,
+      shiptype: String(this.ShipType),
+      name: this.username,
+    };
+  }
+}
+
+module.exports = Player;
