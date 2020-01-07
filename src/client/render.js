@@ -24,7 +24,7 @@ function setCanvasDimensions() {
 window.addEventListener('resize', debounce(40, setCanvasDimensions));
 
 function render() {
-  const { me, others, bullets, heathitems, gunitems, sparklings, explosions } = getCurrentState();
+  const { me, others, bullets, heathitems, gunitems, sparklings, explosions, planets } = getCurrentState();
   if (!me) {
     return;
   }
@@ -37,6 +37,10 @@ function render() {
   context.strokeStyle = 'white';
   context.lineWidth = 1;
   context.strokeRect(canvas.width / 2 - me.x, canvas.height / 2 - me.y, MAP_SIZE, MAP_SIZE);
+
+  // Draw all  Planet
+  if(planets != undefined)
+    planets.forEach(renderPlanet.bind(null, me));
 
   // Draw all bullets
   bullets.forEach(renderBullet.bind(null, me));
@@ -57,6 +61,7 @@ function render() {
 
   // Draw all  explosions
   explosions.forEach(renderExplosion.bind(null, me));
+
 }
 
 function renderBackgroundMainMenu(x, y) {
@@ -89,7 +94,6 @@ function renderBackground(x, y) {
     }
   }
   context.restore();
-
 }
 
 // Renders a ship at the given coordinates
@@ -230,6 +234,21 @@ function renderExplosion(me, item) {
   );
 }
 
+function renderPlanet(me, item) {
+  const { x, y } = item;
+  let currentFR = getJson('spritesheet_planet_01.json').frames[parseInt(item.current_frame)].frame;
+  context.drawImage(
+    getAsset('spritesheet_planet_01.png'),
+    currentFR.x,
+    currentFR.y,
+    currentFR.w,
+    currentFR.h,
+    canvas.width / 2 + x - me.x - Constants.EXPLOSION_RADIUS,
+    canvas.height / 2 + y - me.y - Constants.EXPLOSION_RADIUS,
+    Constants.PLANET_WIDTH,
+    Constants.PLANET_HEIGHT,
+  );
+}
 
 
 function renderMainMenu() {

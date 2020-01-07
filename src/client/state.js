@@ -73,6 +73,7 @@ export function getCurrentState() {
       gunitems: interpolateObjectArray(baseUpdate.gunitems, next.gunitems, ratio),
       sparklings: interpolateObjectArray(baseUpdate.sparklings, next.sparklings, ratio),
       explosions: interpolateObjectArray(baseUpdate.explosions, next.explosions, ratio),
+      planets: interpolateObjectArray(baseUpdate.planets, next.planets, ratio),
     };
   }
 }

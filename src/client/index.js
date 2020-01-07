@@ -24,6 +24,7 @@ Promise.all([
   readJSOn('spritesheet.json'),
   readJSOn('spritesheetspark.json'),
   readJSOn('spritesheetexplosion.json'),
+  readJSOn('spritesheet_planet_01.json'),
 ]).then(() => {
   playMenu.classList.remove('hidden');
   usernameInput.focus();

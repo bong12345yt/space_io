@@ -6,6 +6,7 @@ const ItemHeath = require('./itemHeath');
 const ItemGun = require('./itemGun');
 const Sparkling = require('./Sparkling');
 const Explosion = require('./explosion');
+const Planet = require('./planet');
 class Game {
   constructor() {
     this.sockets = {};
@@ -13,8 +14,10 @@ class Game {
     this.bullets = [];
     this.heathItems = [];
     this.gunItems = [];
-    this.sparklings =[];
-    this.explosions =[];
+    this.sparklings = [];
+    this.explosions = [];
+    this.planets = [];
+    this.planets.push(new Planet(Constants.MAP_SIZE/2, Constants.MAP_SIZE/2, 0));
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
     setInterval(this.update.bind(this), 1000 / 60);
@@ -85,6 +88,16 @@ class Game {
       }
     });
     this.explosions = this.explosions.filter(Explosion => !ExplosionToRemove.includes(Explosion));
+
+    //update planet
+    //const PlanetToRemove = [];
+    this.planets.forEach(planet => {
+      if (planet.update(dt)) {
+        // Destroy this sparkling
+        //ExplosionToRemove.push(Explosion);
+      }
+    });
+    //this.explosions = this.explosions.filter(Explosion => !ExplosionToRemove.includes(Explosion));
 
     // Update each player
     Object.keys(this.sockets).forEach(playerID => {
@@ -187,6 +200,10 @@ class Game {
       b => b.distanceTo(player) <= Constants.MAP_SIZE / 2,
     );
 
+    const nearbyPlanet = this.planets.filter(
+      b => b.distanceTo(player) <= Constants.MAP_SIZE / 2,
+    );
+
     return {
       t: Date.now(),
       me: player.serializeForUpdate(),
@@ -196,6 +213,7 @@ class Game {
       gunitems: nearbyGunItems.map(b => b.serializeForUpdate()),
       sparklings: nearbySparkling.map(b => b.serializeForUpdate()),
       explosions: nearbyExplosion.map(b => b.serializeForUpdate()),
+      planets: nearbyPlanet.map(b => b.serializeForUpdate()),
       leaderboard,
     };
   }

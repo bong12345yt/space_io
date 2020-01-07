@@ -30,6 +30,10 @@ module.exports = Object.freeze({
   EXPLOSION_FRAME_COUNT: 13,
   EXPLOSION_RADIUS: 80,
 
+  PLANET_FRAME_COUNT: 11,
+  PLANET_WIDTH: 336,
+  PLANET_HEIGHT: 189,
+
   MAP_SIZE: 5000,
   MSG_TYPES: {
     JOIN_GAME: 'join_game',
