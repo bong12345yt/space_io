@@ -12,6 +12,11 @@ const ASSET_NAMES = [
   'spritesheetexplosion.png',
   'SpaceBackground-12.jpg',
   'spritesheet_planet_01.png',
+  'spritesheet_star_blue.png',
+  'spritesheet_star_ograne.png',
+  'spritesheet_star_red.png',
+  'spritesheet_star_yellow.png',
+  'spritesheet_star_white.png',
 ];
 
 const assets = {};

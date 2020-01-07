@@ -24,7 +24,12 @@ Promise.all([
   readJSOn('spritesheet.json'),
   readJSOn('spritesheetspark.json'),
   readJSOn('spritesheetexplosion.json'),
+  readJSOn('spritesheet_star_blue.json'),
   readJSOn('spritesheet_planet_01.json'),
+  readJSOn('spritesheet_star_ograne.json'),
+  readJSOn('spritesheet_star_red.json'),
+  readJSOn('spritesheet_star_yellow.json'),
+  readJSOn('spritesheet_star_white.json'),
 ]).then(() => {
   playMenu.classList.remove('hidden');
   usernameInput.focus();

@@ -16,8 +16,15 @@ class Game {
     this.gunItems = [];
     this.sparklings = [];
     this.explosions = [];
+
     this.planets = [];
-    this.planets.push(new Planet(Constants.MAP_SIZE/2, Constants.MAP_SIZE/2, 0));
+    this.planets.push(new Planet(Constants.MAP_SIZE/2, Constants.MAP_SIZE/2, 0, {w: Constants.PLANET_WIDTH, h: Constants.PLANET_HEIGHT}, {Sprite_Json: 'spritesheet_planet_01.json', Sprite_Png: 'spritesheet_planet_01.png'}, 12, 250));
+    this.planets.push(new Planet(Constants.MAP_SIZE/4, Constants.MAP_SIZE/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_blue.json', Sprite_Png: 'spritesheet_star_blue.png'}, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE*3/4, Constants.MAP_SIZE*3.5/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_ograne.json', Sprite_Png: 'spritesheet_star_ograne.png'}, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE*2/4, Constants.MAP_SIZE*4/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_red.json', Sprite_Png: 'spritesheet_star_red.png'}, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE*5.5/6, Constants.MAP_SIZE*1.5/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_yellow.json', Sprite_Png: 'spritesheet_star_yellow.png'}, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE*6/7, Constants.MAP_SIZE*7/8, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_white.json', Sprite_Png: 'spritesheet_star_white.png'}, 4, 130));
+
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
     setInterval(this.update.bind(this), 1000 / 60);

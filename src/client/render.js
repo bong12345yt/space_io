@@ -236,17 +236,22 @@ function renderExplosion(me, item) {
 
 function renderPlanet(me, item) {
   const { x, y } = item;
-  let currentFR = getJson('spritesheet_planet_01.json').frames[parseInt(item.current_frame)].frame;
+  //console.log(item);
+  if (item.sprite.substring(item.sprite.length - 3, item.sprite.length) === 'NaN')
+    item.sprite = item.sprite.substring(0, item.sprite.length - 3);
+  if (item.size.substring(item.size.length - 3, item.size.length) === 'NaN')
+    item.size = item.size.substring(0, item.size.length - 3);
+  let currentFR = getJson(JSON.parse(item.sprite).Sprite_Json).frames[parseInt(item.current_frame)].frame;
   context.drawImage(
-    getAsset('spritesheet_planet_01.png'),
+    getAsset(JSON.parse(item.sprite).Sprite_Png),
     currentFR.x,
     currentFR.y,
     currentFR.w,
     currentFR.h,
     canvas.width / 2 + x - me.x - Constants.EXPLOSION_RADIUS,
     canvas.height / 2 + y - me.y - Constants.EXPLOSION_RADIUS,
-    Constants.PLANET_WIDTH,
-    Constants.PLANET_HEIGHT,
+    JSON.parse(item.size).w,
+    JSON.parse(item.size).h,
   );
 }
 

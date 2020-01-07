@@ -4,14 +4,16 @@ const Animation = require('./animation');
 const shortid = require('shortid');
 
 class Planet extends ObjectClass {
-  constructor(x, y, dir) {
+  constructor(x, y, dir, size, sprite, frameLimit, frameRate) {
     super(shortid(),x, y, dir);
     this.radius = Constants.EXPLOSION_RADIUS;
     this.parentID = null;
     this.anim = new Animation();
-    this.anim.FrameRate = 1000;
-    this.anim.FramesLimit = 12;
+    this.anim.FrameRate = frameRate;
+    this.anim.FramesLimit = frameLimit;
     this.anim.Oscillate = false;
+    this.size = size;
+    this.sprite = sprite;
   }
 
   // Returns true if the bullet should be destroyed
@@ -24,7 +26,9 @@ class Planet extends ObjectClass {
     return {
       ...(super.serializeForUpdate()),
       //direction: this.direction,
-      current_frame: this.anim.CurrentFrame,     
+      current_frame: this.anim.CurrentFrame,   
+      size: JSON.stringify(this.size),
+      sprite: JSON.stringify(this.sprite)  
     };
   }
 }
