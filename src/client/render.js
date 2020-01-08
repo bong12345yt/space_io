@@ -154,11 +154,12 @@ function renderPlayer(me, player) {
 }
 
 function renderBullet(me, bullet) {
-  const { x, y } = bullet;
+  const { x, y, direction} = bullet;
   const canvasX = canvas.width / 2 + x - me.x;
   const canvasY = canvas.height / 2 + y - me.y;
   context.save();
   context.translate(canvasX, canvasY);
+  context.rotate(direction);
   context.drawImage(
     getAsset('bullet.png'),
     - BULLET_RADIUS,
