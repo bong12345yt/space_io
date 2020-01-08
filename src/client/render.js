@@ -24,7 +24,7 @@ function setCanvasDimensions() {
 window.addEventListener('resize', debounce(40, setCanvasDimensions));
 
 function render() {
-  const { me, others, bullets, heathitems, gunitems, sparklings, explosions, planets } = getCurrentState();
+  const { me, others, bullets, heathitems, gunitems, sparklings, explosions, planets, bombs } = getCurrentState();
   if (!me) {
     return;
   }
@@ -41,6 +41,10 @@ function render() {
   // Draw all  Planet
   if(planets != undefined)
     planets.forEach(renderPlanet.bind(null, me));
+
+  // Draw all  bomb
+  if(bombs != undefined)
+    bombs.forEach(renderBomb.bind(null, me));
 
   // Draw all bullets
   bullets.forEach(renderBullet.bind(null, me));
@@ -253,6 +257,27 @@ function renderPlanet(me, item) {
     canvas.height / 2 + y - me.y - Constants.EXPLOSION_RADIUS,
     JSON.parse(item.size).w,
     JSON.parse(item.size).h,
+  );
+}
+
+function renderBomb(me, item) {
+  const { x, y } = item;
+  //console.log(item);
+  if (item.sprite.substring(item.sprite.length - 3, item.sprite.length) === 'NaN')
+    item.sprite = item.sprite.substring(0, item.sprite.length - 3);
+  if (item.size.substring(item.size.length - 3, item.size.length) === 'NaN')
+    item.size = item.size.substring(0, item.size.length - 3);
+  let currentFR = getJson(JSON.parse(item.sprite).Sprite_Json).frames[parseInt(item.current_frame)].frame;
+  context.drawImage(
+    getAsset(JSON.parse(item.sprite).Sprite_Png),
+    currentFR.x,
+    currentFR.y,
+    currentFR.w,
+    currentFR.h,
+    canvas.width / 2 + x - me.x - JSON.parse(item.size).w/2,
+    canvas.height / 2 + y - me.y - JSON.parse(item.size).h/2,
+    JSON.parse(item.size).w/2,
+    JSON.parse(item.size).h/2,
   );
 }
 

@@ -7,6 +7,7 @@ const ItemGun = require('./itemGun');
 const Sparkling = require('./Sparkling');
 const Explosion = require('./explosion');
 const Planet = require('./planet');
+const Bomb = require('./bomb');
 class Game {
   constructor() {
     this.sockets = {};
@@ -16,6 +17,7 @@ class Game {
     this.gunItems = [];
     this.sparklings = [];
     this.explosions = [];
+    this.bombs = [];
 
     this.planets = [];
     this.planets.push(new Planet(Constants.MAP_SIZE/2, Constants.MAP_SIZE/2, 0, {w: Constants.PLANET_WIDTH, h: Constants.PLANET_HEIGHT}, {Sprite_Json: 'spritesheet_planet_01.json', Sprite_Png: 'spritesheet_planet_01.png'}, 12, 250));
@@ -24,6 +26,21 @@ class Game {
     this.planets.push(new Planet(Constants.MAP_SIZE*2/4, Constants.MAP_SIZE*4/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_red.json', Sprite_Png: 'spritesheet_star_red.png'}, 4, 130));
     this.planets.push(new Planet(Constants.MAP_SIZE*5.5/6, Constants.MAP_SIZE*1.5/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_yellow.json', Sprite_Png: 'spritesheet_star_yellow.png'}, 4, 130));
     this.planets.push(new Planet(Constants.MAP_SIZE*6/7, Constants.MAP_SIZE*7/8, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_white.json', Sprite_Png: 'spritesheet_star_white.png'}, 4, 130));
+
+    this.bombs.push(new Bomb(Constants.MAP_SIZE/3, Constants.MAP_SIZE/3, 0,  {w: 76, h: 151},
+      {
+        idle : {Sprite_Json: 'spritesheet_bomb_1_idle.json', Sprite_Png: 'spritesheet_bomb_1_idle.png'},
+        explosion : {Sprite_Json: 'spritesheet_bomb_1_explosion.json', Sprite_Png: 'spritesheet_bomb_1_explosion.png'}
+      },
+      {
+        idle : 10,
+        explosion : 9
+      },
+      {
+        idle : 100,
+        explosion : 100
+      }
+    ))
 
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
@@ -95,6 +112,15 @@ class Game {
       }
     });
     this.explosions = this.explosions.filter(Explosion => !ExplosionToRemove.includes(Explosion));
+
+    const bombToRemove = [];
+    this.bombs.forEach(bomb => {
+      if (bomb.update(dt)) {
+        // Destroy this sparkling
+        bombToRemove.push(bomb);
+      }
+    });
+    this.bombs = this.bombs.filter(bomb => !bombToRemove.includes(bomb));
 
     //update planet
     //const PlanetToRemove = [];
@@ -211,6 +237,10 @@ class Game {
       b => b.distanceTo(player) <= Constants.MAP_SIZE / 2,
     );
 
+    const nearbyBomb = this.bombs.filter(
+      b => b.distanceTo(player) <= Constants.MAP_SIZE / 2,
+    );
+
     return {
       t: Date.now(),
       me: player.serializeForUpdate(),
@@ -221,6 +251,7 @@ class Game {
       sparklings: nearbySparkling.map(b => b.serializeForUpdate()),
       explosions: nearbyExplosion.map(b => b.serializeForUpdate()),
       planets: nearbyPlanet.map(b => b.serializeForUpdate()),
+      bombs: nearbyBomb.map(b => b.serializeForUpdate()),
       leaderboard,
     };
   }

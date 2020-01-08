@@ -17,6 +17,8 @@ const ASSET_NAMES = [
   'spritesheet_star_red.png',
   'spritesheet_star_yellow.png',
   'spritesheet_star_white.png',
+  'spritesheet_bomb_1_idle.png',
+  'spritesheet_bomb_1_explosion.png',
 ];
 
 const assets = {};
