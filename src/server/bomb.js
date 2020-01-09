@@ -3,7 +3,7 @@ const Constants = require('../shared/constants');
 const Animation = require('./animation');
 const shortid = require('shortid');
 
-class Planet extends ObjectClass {
+class BomB extends ObjectClass {
   constructor(x, y, dir, size, sprites, frameLimit, frameRate) {
     super(shortid(),x, y, dir);
     
@@ -37,10 +37,10 @@ class Planet extends ObjectClass {
       ...(super.serializeForUpdate()),
       //direction: this.direction,
       current_frame: this.anims[this.animPlay].CurrentFrame,
-      size: JSON.stringify(this.size),   
+      size: this.animPlay == "idle" ? JSON.stringify(this.size.idle) : JSON.stringify(this.size.explosion) ,   
       sprite: JSON.stringify(this.sprites[this.animPlay])  
     };
   }
 }
 
-module.exports = Planet;
+module.exports = BomB;

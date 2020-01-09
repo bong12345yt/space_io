@@ -73,8 +73,8 @@ class Player extends ObjectClass {
     this.currentSpeed = this.currentSpeed + 100;
   }
 
-  takeBulletDamage() {
-    this.hp -= Constants.BULLET_DAMAGE;
+  takeDamage(dame) {
+    this.hp -= dame;
   }
 
   takeHeal() {

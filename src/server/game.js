@@ -1,7 +1,8 @@
 const Constants = require('../shared/constants');
 const Player = require('./player');
-const applyCollisions = require('./collisions');
-const applyCollisionsItem = require('./collisionItem');
+const applyCollisionPlayerAndBullet = require('./collisions/collisionPlayerAndBullet');
+const applyCollisionPlayerAndItem = require('./collisions/collisionPlayerAndItem');
+const applyCollisionPlayerAndBomb = require('./collisions/collisionPlayerAndBomb');
 const ItemHeath = require('./itemHeath');
 const ItemGun = require('./itemGun');
 const Sparkling = require('./Sparkling');
@@ -20,31 +21,44 @@ class Game {
     this.bombs = [];
 
     this.planets = [];
-    this.planets.push(new Planet(Constants.MAP_SIZE/2, Constants.MAP_SIZE/2, 0, {w: Constants.PLANET_WIDTH, h: Constants.PLANET_HEIGHT}, {Sprite_Json: 'spritesheet_planet_01.json', Sprite_Png: 'spritesheet_planet_01.png'}, 12, 250));
-    this.planets.push(new Planet(Constants.MAP_SIZE/4, Constants.MAP_SIZE/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_blue.json', Sprite_Png: 'spritesheet_star_blue.png'}, 4, 130));
-    this.planets.push(new Planet(Constants.MAP_SIZE*3/4, Constants.MAP_SIZE*3.5/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_ograne.json', Sprite_Png: 'spritesheet_star_ograne.png'}, 4, 130));
-    this.planets.push(new Planet(Constants.MAP_SIZE*2/4, Constants.MAP_SIZE*4/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_red.json', Sprite_Png: 'spritesheet_star_red.png'}, 4, 130));
-    this.planets.push(new Planet(Constants.MAP_SIZE*5.5/6, Constants.MAP_SIZE*1.5/5, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_yellow.json', Sprite_Png: 'spritesheet_star_yellow.png'}, 4, 130));
-    this.planets.push(new Planet(Constants.MAP_SIZE*6/7, Constants.MAP_SIZE*7/8, 0, {w: 512, h: 512}, {Sprite_Json: 'spritesheet_star_white.json', Sprite_Png: 'spritesheet_star_white.png'}, 4, 130));
-
-    this.bombs.push(new Bomb(Constants.MAP_SIZE/3, Constants.MAP_SIZE/3, 0,  {w: 76, h: 151},
-      {
-        idle : {Sprite_Json: 'spritesheet_bomb_1_idle.json', Sprite_Png: 'spritesheet_bomb_1_idle.png'},
-        explosion : {Sprite_Json: 'spritesheet_bomb_1_explosion.json', Sprite_Png: 'spritesheet_bomb_1_explosion.png'}
-      },
-      {
-        idle : 10,
-        explosion : 9
-      },
-      {
-        idle : 100,
-        explosion : 100
-      }
-    ))
+    this.planets.push(new Planet(Constants.MAP_SIZE / 2, Constants.MAP_SIZE / 2, 0, { w: Constants.PLANET_WIDTH, h: Constants.PLANET_HEIGHT }, { Sprite_Json: 'spritesheet_planet_01.json', Sprite_Png: 'spritesheet_planet_01.png' }, 12, 250));
+    this.planets.push(new Planet(Constants.MAP_SIZE / 4, Constants.MAP_SIZE / 5, 0, { w: 512, h: 512 }, { Sprite_Json: 'spritesheet_star_blue.json', Sprite_Png: 'spritesheet_star_blue.png' }, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE * 3 / 4, Constants.MAP_SIZE * 3.5 / 5, 0, { w: 512, h: 512 }, { Sprite_Json: 'spritesheet_star_ograne.json', Sprite_Png: 'spritesheet_star_ograne.png' }, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE * 2 / 4, Constants.MAP_SIZE * 4 / 5, 0, { w: 512, h: 512 }, { Sprite_Json: 'spritesheet_star_red.json', Sprite_Png: 'spritesheet_star_red.png' }, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE * 5.5 / 6, Constants.MAP_SIZE * 1.5 / 5, 0, { w: 512, h: 512 }, { Sprite_Json: 'spritesheet_star_yellow.json', Sprite_Png: 'spritesheet_star_yellow.png' }, 4, 130));
+    this.planets.push(new Planet(Constants.MAP_SIZE * 6 / 7, Constants.MAP_SIZE * 7 / 8, 0, { w: 512, h: 512 }, { Sprite_Json: 'spritesheet_star_white.json', Sprite_Png: 'spritesheet_star_white.png' }, 4, 130));
 
     this.lastUpdateTime = Date.now();
     this.shouldSendUpdate = false;
+    this.randomBomb = 13000;
     setInterval(this.update.bind(this), 1000 / 60);
+    setInterval(this.addBombRandom.bind(this), this.randomBomb);
+  }
+
+  addBombRandom() {
+    let randomDistanceBetweenBombs = Math.floor(Math.random() * 100) + 1060;
+    if (this.bombs.length < Constants.BOMB_MAX_NUM_ON_MAP) {
+      let randomX = Math.floor(Math.random() * ((Constants.MAP_SIZE - 100) - 100 + 1) + 100);
+      let randomY = Math.floor(Math.random() * ((Constants.MAP_SIZE - 100) - 100 + 1) + 100);
+      this.bombs.push(new Bomb(randomX, randomY, 0,
+        {
+          idle: { w: 203, h: 203 },
+          explosion: { w: 203, h: 203 },
+        },
+        {
+          idle: { Sprite_Json: 'spritesheet_bomb_1_idle.json', Sprite_Png: 'spritesheet_bomb_1_idle.png' },
+          explosion: { Sprite_Json: 'spritesheet_bomb_1_explosion.json', Sprite_Png: 'spritesheet_bomb_1_explosion.png' }
+        },
+        {
+          idle: 10,
+          explosion: 9
+        },
+        {
+          idle: 100,
+          explosion: 120
+        }
+      ))
+    }
   }
 
   addPlayer(socket, data) {
@@ -145,17 +159,26 @@ class Game {
     });
 
     // Apply collisions, give players score for hitting bullets
-    const destroyedBullets = applyCollisions(Object.values(this.players), this.bullets);
+    const destroyedBullets = applyCollisionPlayerAndBullet(Object.values(this.players), this.bullets);
     destroyedBullets.forEach(b => {
       if (this.players[b.parentID]) {
         this.players[b.parentID].onDealtDamage();
-        this.sparklings.push(new Sparkling(b.x,b.y, 0));
+        this.sparklings.push(new Sparkling(b.x, b.y, 0));
       }
     });
     this.bullets = this.bullets.filter(bullet => !destroyedBullets.includes(bullet));
 
+    // Apply collisions, give players score for hitting Bomb
+    const destroyedBombs = applyCollisionPlayerAndBomb(Object.values(this.players), this.bombs);
+    destroyedBombs.forEach(b => {
+      //this.players[b.parentID].onDealtDamage();
+      //this.sparklings.push(new Sparkling(b.x,b.y, 0));
+      b.animPlay = "explosion";
+    });
+    //this.bombs = this.bombs.filter(bomb => !destroyedBombs.includes(bomb));
+
     // Apply collisions, give players score for heath items
-    const destroyedHeathItems = applyCollisionsItem(Object.values(this.players), this.heathItems);
+    const destroyedHeathItems = applyCollisionPlayerAndItem(Object.values(this.players), this.heathItems);
     destroyedHeathItems.forEach(b => {
       if (this.players[b.parentID]) {
         this.players[b.parentID].takeHeal();
@@ -164,7 +187,7 @@ class Game {
     this.heathItems = this.heathItems.filter(item => !destroyedHeathItems.includes(item));
 
     // Apply collisions, give players score for gun items
-    const destroyedGunItems = applyCollisionsItem(Object.values(this.players), this.gunItems);
+    const destroyedGunItems = applyCollisionPlayerAndItem(Object.values(this.players), this.gunItems);
     destroyedGunItems.forEach(b => {
       if (this.players[b.parentID]) {
         this.players[b.parentID].takeGun();
@@ -178,11 +201,11 @@ class Game {
       const player = this.players[playerID];
       if (player.hp <= 0) {
         var random = Math.floor(Math.random() * 2);
-        if(random){
+        if (random) {
           this.heathItems.push(new ItemHeath(player.x, player.y, 0));
         }
         this.explosions.push(new Explosion(player.x, player.y, 0));
-        this.gunItems.push(new ItemGun( player.x + Constants.ITEM_MAX_ALIGN_X, player.y, 0));
+        this.gunItems.push(new ItemGun(player.x + Constants.ITEM_MAX_ALIGN_X, player.y, 0));
         socket.emit(Constants.MSG_TYPES.GAME_OVER);
         this.removePlayer(socket);
       }

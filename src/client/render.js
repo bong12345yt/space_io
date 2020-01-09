@@ -274,8 +274,8 @@ function renderBomb(me, item) {
     currentFR.y,
     currentFR.w,
     currentFR.h,
-    canvas.width / 2 + x - me.x - JSON.parse(item.size).w/2,
-    canvas.height / 2 + y - me.y - JSON.parse(item.size).h/2,
+    canvas.width / 2 + x - me.x - Constants.BOMB_RADIUS,
+    canvas.height / 2 + y - me.y - Constants.BOMB_RADIUS,
     JSON.parse(item.size).w/2,
     JSON.parse(item.size).h/2,
   );
