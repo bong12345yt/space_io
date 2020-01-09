@@ -11,7 +11,7 @@ function applyCollisions(players, bombs) {
       const player = players[j];
       if (
         bomb.parentID !== player.id &&
-        player.distanceTo(bomb) <= Constants.PLAYER_RADIUS + (bomb.animPlay == "idle" ? Constants.BOMB_RADIUS : (Constants.BOMB_RADIUS + 40))
+        player.distanceTo(bomb) <= Constants.PLAYER_RADIUS + (bomb.animPlay == "idle" ? Constants.BOMB_RADIUS : (Constants.BOMB_RADIUS + 20))
       ) {
         destroyedBombs.push(bomb);
         player.takeDamage(Constants.BOMB_DAMAGE_PER_FRAME);

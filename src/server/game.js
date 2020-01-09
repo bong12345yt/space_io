@@ -36,7 +36,7 @@ class Game {
   }
 
   addBombRandom() {
-    let randomDistanceBetweenBombs = Math.floor(Math.random() * 100) + 1060;
+
     if (this.bombs.length < Constants.BOMB_MAX_NUM_ON_MAP) {
       let randomX = Math.floor(Math.random() * ((Constants.MAP_SIZE - 100) - 100 + 1) + 100);
       let randomY = Math.floor(Math.random() * ((Constants.MAP_SIZE - 100) - 100 + 1) + 100);
@@ -55,7 +55,7 @@ class Game {
         },
         {
           idle: 100,
-          explosion: 120
+          explosion: 110
         }
       ))
     }
