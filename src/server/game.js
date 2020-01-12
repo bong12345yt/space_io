@@ -3,6 +3,7 @@ const Player = require('./player');
 const applyCollisionPlayerAndBullet = require('./collisions/collisionPlayerAndBullet');
 const applyCollisionPlayerAndItem = require('./collisions/collisionPlayerAndItem');
 const applyCollisionPlayerAndBomb = require('./collisions/collisionPlayerAndBomb');
+const applyCollisionPlayerAndPlayer = require('./collisions/collisionPlayerAndPlayer');
 const ItemHeath = require('./itemHeath');
 const ItemGun = require('./itemGun');
 const Sparkling = require('./Sparkling');
@@ -176,6 +177,9 @@ class Game {
       b.animPlay = "explosion";
     });
     //this.bombs = this.bombs.filter(bomb => !destroyedBombs.includes(bomb));
+
+    // Apply collisions, give players 
+    applyCollisionPlayerAndPlayer(Object.values(this.players), Object.values(this.players), dt);
 
     // Apply collisions, give players score for heath items
     const destroyedHeathItems = applyCollisionPlayerAndItem(Object.values(this.players), this.heathItems);

@@ -155,6 +155,14 @@ function renderPlayer(me, player) {
   context.font = "15px Arial";
   context.fillText(name, canvasX - context.measureText(name).width / 2, canvasY + PLAYER_RADIUS + 7);
   context.restore();
+
+  // context.moveTo(canvasX + Math.sin(direction),
+  //   canvasY - PLAYER_RADIUS/2  - Math.cos(direction));
+  // context.lineTo(canvasX,
+  //   canvasY);
+  // context.strokeStyle = "yellow";
+  // context.stroke();
+  // context.restore();
 }
 
 function renderBullet(me, bullet) {

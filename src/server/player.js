@@ -18,6 +18,9 @@ class Player extends ObjectClass {
     this.isSpeedUp = false;
     this.mousePos = {distance:0}; 
     this.currentSpeed = this.speed;
+    this.directionPos = {x:0, y:0};
+    this.directionPos.x = this.x;
+    this.directionPos.y = this.y - Constants.PLAYER_RADIUS;
   }
 
   // Returns a newly created bullet, or null.
@@ -27,6 +30,8 @@ class Player extends ObjectClass {
     this.speed = (realSpeed > 1.0) ? this.currentSpeed : realSpeed*this.currentSpeed;
 
     super.update(dt);
+    this.directionPos.x += dt * this.speed * Math.sin(this.direction);
+    this.directionPos.y -= dt * this.speed * Math.cos(this.direction);
     this.anim.OnAnimate();
 
     // Update score
