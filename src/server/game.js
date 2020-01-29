@@ -20,6 +20,7 @@ class Game {
     this.sparklings = [];
     this.explosions = [];
     this.bombs = [];
+    this.bots = [];
 
     this.planets = [];
     this.planets.push(new Planet(Constants.MAP_SIZE / 2, Constants.MAP_SIZE / 2, 0, { w: Constants.PLANET_WIDTH, h: Constants.PLANET_HEIGHT }, { Sprite_Json: 'spritesheet_planet_01.json', Sprite_Png: 'spritesheet_planet_01.png' }, 12, 250));
@@ -69,6 +70,20 @@ class Game {
     const x = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
     const y = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
     this.players[socket.id] = new Player(socket.id, data.UserName, x, y, data.ShipType);
+  }
+
+  addBot() {
+    var socket = require('socket.io-client')('http://localhost');
+    // this.sockets[socket.id] = socket;
+    const id = 0;
+    const user_name = "dddd";
+    const type = "spritesheet.png"
+    socket.id = id;
+    this.sockets[socket.id] = socket;
+    // Generate a position to start this player at.
+    const x = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
+    const y = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
+    this.players[id] = new Player(id, user_name, x, y, type);
   }
 
   removePlayer(socket) {
