@@ -44,7 +44,7 @@ const game = new Game();
 
 function joinGame(data) {
   game.addPlayer(this, data);
-  game.addBot();
+  game.addBots();
 }
 
 function handleInput(dir) {

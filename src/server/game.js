@@ -72,23 +72,31 @@ class Game {
     this.players[socket.id] = new Player(socket.id, data.UserName, x, y, data.ShipType);
   }
 
-  addBot() {
-    var socket = require('socket.io-client')('http://localhost');
-    // this.sockets[socket.id] = socket;
-    const id = 0;
-    const user_name = "dddd";
-    const type = "spritesheet.png"
-    socket.id = id;
-    this.sockets[socket.id] = socket;
-    // Generate a position to start this player at.
-    const x = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
-    const y = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
-    this.players[id] = new Player(id, user_name, x, y, type);
+  addBots() {
+    var count = 0;
+    while(Object.keys(this.players).length < Constants.AMOUNT_OF_BOTS) {
+      var socket = require('socket.io-client')('http://localhost');
+      socket.id = Constants.ID_BOTS[count];
+      const type = "spritesheet.png"
+      const data = {UserName: Constants.NAME_BOTS[count], ShipType: type};
+      this.addPlayer(socket,data);
+      count++;
+    }
+  }
+
+  addBot(socket) {
+    const type = "spritesheet.png";
+    const data = {UserName: Constants.NAME_BOTS[socket.id], ShipType: type};
+    this.addPlayer(socket,data);
   }
 
   removePlayer(socket) {
     delete this.sockets[socket.id];
     delete this.players[socket.id];
+
+    if(!isNaN(socket.id)) {
+      this.addBot(socket);
+    }
   }
 
   handleInput(socket, dir) {

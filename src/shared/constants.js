@@ -47,4 +47,22 @@ module.exports = Object.freeze({
     GAME_OVER: 'dead',
     INPUT_MOUSE_LEFT_CLICK: 'mouseleftclick',
   },
+
+  ID_BOTS: [
+    BOT_ONE = 0,
+    BOT_TWO = 1,
+    BOT_THREE = 2,
+    BOT_FOUR = 3,
+    BOT_FINE = 4,
+  ],
+
+  NAME_BOTS: [
+    BOT_ONE = 'bot_1',
+    BOT_TWO = 'bot_2',
+    BOT_THREE = 'bot_3',
+    BOT_FOUR = 'bot_4',
+    BOT_FINE = 'bot_5',
+  ],
+
+  AMOUNT_OF_BOTS: 5,
 });
