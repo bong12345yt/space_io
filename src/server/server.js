@@ -52,6 +52,8 @@ function handleInput(dir) {
 }
 
 function handleMousePos(dis) {
+  // console.log("Dis: ")
+  // console.log(dis);
   game.handleMousePos(this, dis);
 }
 

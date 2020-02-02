@@ -6,8 +6,6 @@ const canvas = document.getElementById('game-canvas');
 
 function onMouseInput(e) {
   handleInput(e.clientX, e.clientY);
-  
-  
 }
 
 function onMouseClick(e) {

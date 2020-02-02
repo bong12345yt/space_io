@@ -64,5 +64,13 @@ module.exports = Object.freeze({
     BOT_FINE = 'bot_5',
   ],
 
+  SHIP_BOTS: [
+    BOT_ONE = 'spritesheet.png',
+    BOT_TWO = 'spritesheet2.png',
+    BOT_THREE = 'spritesheet3.png',
+    BOT_FOUR = 'spritesheet4.png',
+    BOT_FINE = 'spritesheet5.png',
+  ],
+
   AMOUNT_OF_BOTS: 5,
 });

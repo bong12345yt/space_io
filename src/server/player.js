@@ -21,6 +21,8 @@ class Player extends ObjectClass {
     this.directionPos = {x:0, y:0};
     this.directionPos.x = this.x;
     this.directionPos.y = this.y - Constants.PLAYER_RADIUS;
+
+    this.move = 0;
   }
 
   // Returns a newly created bullet, or null.

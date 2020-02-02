@@ -1,3 +1,4 @@
+const throttleParent = require('throttle-debounce');
 const Constants = require('../shared/constants');
 const Player = require('./player');
 const applyCollisionPlayerAndBullet = require('./collisions/collisionPlayerAndBullet');
@@ -35,6 +36,8 @@ class Game {
     this.randomBomb = 13000;
     setInterval(this.update.bind(this), 1000 / 60);
     setInterval(this.addBombRandom.bind(this), this.randomBomb);
+
+    this.lastUpdateBots = Date.now();
   }
 
   addBombRandom() {
@@ -72,30 +75,42 @@ class Game {
     this.players[socket.id] = new Player(socket.id, data.UserName, x, y, data.ShipType);
   }
 
+  addBot(socket, data) {
+    this.sockets[socket.id] = socket;
+
+    // Generate a position to start this player at.
+    var x = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
+    var y = Constants.MAP_SIZE * (0.25 + Math.random() * 0.5);
+    if (socket.id == 0) {
+      x = 0;
+      y = 0;
+    }
+    this.players[socket.id] = new Player(socket.id, data.UserName, x, y, data.ShipType);
+  }
+
   addBots() {
     var count = 0;
-    while(Object.keys(this.players).length < Constants.AMOUNT_OF_BOTS) {
+    // while (Object.keys(this.players).length < Constants.AMOUNT_OF_BOTS) {
+    while (count < Constants.AMOUNT_OF_BOTS) {
       var socket = require('socket.io-client')('http://localhost');
       socket.id = Constants.ID_BOTS[count];
-      const type = "spritesheet.png"
-      const data = {UserName: Constants.NAME_BOTS[count], ShipType: type};
-      this.addPlayer(socket,data);
+      const data = { UserName: Constants.NAME_BOTS[count], ShipType: Constants.SHIP_BOTS[socket.id] };
+      this.addBot(socket, data);
       count++;
     }
   }
 
-  addBot(socket) {
-    const type = "spritesheet.png";
-    const data = {UserName: Constants.NAME_BOTS[socket.id], ShipType: type};
-    this.addPlayer(socket,data);
+  addBotDead(socket) {
+    const data = { UserName: Constants.NAME_BOTS[socket.id], ShipType: Constants.SHIP_BOTS[socket.id] };
+    this.addPlayer(socket, data);
   }
 
   removePlayer(socket) {
     delete this.sockets[socket.id];
     delete this.players[socket.id];
 
-    if(!isNaN(socket.id)) {
-      this.addBot(socket);
+    if (!isNaN(socket.id)) {
+      this.addBotDead(socket);
     }
   }
 
@@ -183,7 +198,9 @@ class Game {
     });
 
     // Apply collisions, give players score for hitting bullets
-    const destroyedBullets = applyCollisionPlayerAndBullet(Object.values(this.players), this.bullets);
+    // const destroyedBullets = applyCollisionPlayerAndBullet(Object.values(this.players), this.bullets);
+    const result = applyCollisionPlayerAndBullet(Object.values(this.players), this.bullets);
+    const destroyedBullets = result.destroyedBullets;
     destroyedBullets.forEach(b => {
       if (this.players[b.parentID]) {
         this.players[b.parentID].onDealtDamage();
@@ -191,6 +208,104 @@ class Game {
       }
     });
     this.bullets = this.bullets.filter(bullet => !destroyedBullets.includes(bullet));
+
+    //Update bots
+    var i;
+    const damagedPlayerMap = result.damagedPlayerMap;
+
+    const nowTime = Date.now();
+    const diffTime = (nowTime - this.lastUpdateBots) / 1000;
+    var flag = false;
+
+    for (i = 0; i < Constants.AMOUNT_OF_BOTS; i++) {
+      var player = this.players[Constants.ID_BOTS[i]];
+      var socket = this.sockets[Constants.ID_BOTS[i]];
+      if (player && socket) {
+        if (diffTime > 0.3) {
+          player.move = Math.floor((Math.random() * 2));
+          flag = true;
+        }
+        //Get ship damage bot
+        if (damagedPlayerMap.size != 0) {
+          const playerIdDamage = damagedPlayerMap.get(Constants.ID_BOTS[i]);
+          const playerEnemy = this.players[playerIdDamage];
+          if (playerIdDamage) {
+            if (this.players[playerIdDamage]) {
+              var posShipX = this.players[playerIdDamage].x;
+              var posShipY = this.players[playerIdDamage].y;
+              var posBotX = this.players[Constants.ID_BOTS[i]].x;
+              var posBotY = this.players[Constants.ID_BOTS[i]].y;
+              if (posShipX > posBotX) {
+                player.x += 1;
+              } else {
+                player.x -= 1;
+              }
+
+              if (posShipY > posBotY) {
+                player.y += 1;
+              } else {
+                player.y -= 1;
+              }
+              var x = player.x;
+              var y = player.y;
+
+              const dir = -(playerEnemy.direction);
+              this.handleInput(socket, dir);
+            }
+          } else {
+            var dir = 0;
+            switch (player.move) {
+              case 0: {
+                if (player.x < Constants.MAP_SIZE / 2) {
+                  player.x += 1;
+                  dir = 1.5;
+                } else {
+                  player.x -= 1;
+                  dir = -1.5;
+                }
+              };
+              case 1: {
+                if (player.y < Constants.MAP_SIZE / 2) {
+                  player.y += 1;
+                  dir = 3
+                } else {
+                  player.y -= 1;
+                  dir = 0
+                }
+              }
+            }
+            this.handleInput(socket, dir);
+          }
+        } else {
+          var dir = 0;
+          switch (player.move) {
+            case 0: {
+              if (player.x < Constants.MAP_SIZE / 2) {
+                player.x += 1;
+                dir = 1.5;
+              } else {
+                player.x -= 1;
+                dir = -1.5;
+              }
+            };
+            case 1: {
+              if (player.y < Constants.MAP_SIZE / 2) {
+                player.y += 1;
+                dir = 3
+              } else {
+                player.y -= 1;
+                dir = 0
+              }
+            }
+          }
+          this.handleInput(socket, dir);
+        }
+      }
+    }
+    if (flag) {
+      this.lastUpdateBots = nowTime;
+    }
+    //
 
     // Apply collisions, give players score for hitting Bomb
     const destroyedBombs = applyCollisionPlayerAndBomb(Object.values(this.players), this.bombs);
