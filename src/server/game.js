@@ -100,6 +100,46 @@ class Game {
     }
   }
 
+  updateBots(){
+    const nowTime = Date.now();
+    const diffTime = (nowTime - this.lastUpdateBots) / 1000;
+    for (let i = 0; i < Constants.AMOUNT_OF_BOTS; i++) {
+      var player = this.players[Constants.ID_BOTS[i]];
+      var socket = this.sockets[Constants.ID_BOTS[i]];
+      var dir = 1;
+      if (player && socket) {
+        player.mousePos.distance = 200;
+        var minDistancePlayer = Number.MAX_SAFE_INTEGER;
+        var playerMindis = null;
+        Object.keys(this.sockets).forEach(playerID => {
+          const playerx = this.players[playerID];
+          if(playerx.id != player.id){    
+            var a = player.x - playerx.x;
+            var b = player.y - playerx.y;
+            var distanceCa = Math.sqrt( a*a + b*b );
+            minDistancePlayer = Math.min(minDistancePlayer, distanceCa);
+            if(minDistancePlayer == distanceCa){
+              playerMindis = playerx;
+              dir = Math.atan2(b,a) + 50;
+            }
+              
+          }
+          
+        });
+        //console.log(playerMindis);
+        if(playerMindis != null){
+          this.handleInput(socket, dir);
+          //console.log(playerMindis.direction);
+          this.lastUpdateBots = Date.now();
+        }else{
+          this.handleInput(socket, 1);
+        }
+          
+      }
+      
+    }
+  }
+
   addBotDead(socket) {
     const data = { UserName: Constants.NAME_BOTS[socket.id], ShipType: Constants.SHIP_BOTS[socket.id] };
     this.addPlayer(socket, data);
@@ -210,101 +250,9 @@ class Game {
     this.bullets = this.bullets.filter(bullet => !destroyedBullets.includes(bullet));
 
     //Update bots
-    var i;
-    const damagedPlayerMap = result.damagedPlayerMap;
+    this.updateBots();
 
-    const nowTime = Date.now();
-    const diffTime = (nowTime - this.lastUpdateBots) / 1000;
-    var flag = false;
-
-    for (i = 0; i < Constants.AMOUNT_OF_BOTS; i++) {
-      var player = this.players[Constants.ID_BOTS[i]];
-      var socket = this.sockets[Constants.ID_BOTS[i]];
-      if (player && socket) {
-        if (diffTime > 0.3) {
-          player.move = Math.floor((Math.random() * 2));
-          flag = true;
-        }
-        //Get ship damage bot
-        if (damagedPlayerMap.size != 0) {
-          const playerIdDamage = damagedPlayerMap.get(Constants.ID_BOTS[i]);
-          const playerEnemy = this.players[playerIdDamage];
-          if (playerIdDamage) {
-            if (this.players[playerIdDamage]) {
-              var posShipX = this.players[playerIdDamage].x;
-              var posShipY = this.players[playerIdDamage].y;
-              var posBotX = this.players[Constants.ID_BOTS[i]].x;
-              var posBotY = this.players[Constants.ID_BOTS[i]].y;
-              if (posShipX > posBotX) {
-                player.x += 1;
-              } else {
-                player.x -= 1;
-              }
-
-              if (posShipY > posBotY) {
-                player.y += 1;
-              } else {
-                player.y -= 1;
-              }
-              var x = player.x;
-              var y = player.y;
-
-              const dir = -(playerEnemy.direction);
-              this.handleInput(socket, dir);
-            }
-          } else {
-            var dir = 0;
-            switch (player.move) {
-              case 0: {
-                if (player.x < Constants.MAP_SIZE / 2) {
-                  player.x += 1;
-                  dir = 1.5;
-                } else {
-                  player.x -= 1;
-                  dir = -1.5;
-                }
-              };
-              case 1: {
-                if (player.y < Constants.MAP_SIZE / 2) {
-                  player.y += 1;
-                  dir = 3
-                } else {
-                  player.y -= 1;
-                  dir = 0
-                }
-              }
-            }
-            this.handleInput(socket, dir);
-          }
-        } else {
-          var dir = 0;
-          switch (player.move) {
-            case 0: {
-              if (player.x < Constants.MAP_SIZE / 2) {
-                player.x += 1;
-                dir = 1.5;
-              } else {
-                player.x -= 1;
-                dir = -1.5;
-              }
-            };
-            case 1: {
-              if (player.y < Constants.MAP_SIZE / 2) {
-                player.y += 1;
-                dir = 3
-              } else {
-                player.y -= 1;
-                dir = 0
-              }
-            }
-          }
-          this.handleInput(socket, dir);
-        }
-      }
-    }
-    if (flag) {
-      this.lastUpdateBots = nowTime;
-    }
+    
     //
 
     // Apply collisions, give players score for hitting Bomb
