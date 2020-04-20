@@ -44,6 +44,7 @@ const game = new Game();
 
 function joinGame(data) {
   game.addPlayer(this, data);
+  game.addBots();
 }
 
 function handleInput(dir) {
@@ -51,6 +52,8 @@ function handleInput(dir) {
 }
 
 function handleMousePos(dis) {
+  // console.log("Dis: ")
+  // console.log(dis);
   game.handleMousePos(this, dis);
 }
 
